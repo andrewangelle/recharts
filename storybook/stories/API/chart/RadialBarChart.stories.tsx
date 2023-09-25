@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from 'react';
 import { pageData, pageDataWithFillColor } from '../../data';
-import { RadialBar, RadialBarChart, ResponsiveContainer, Cell, Legend } from '../../../../src';
+import { Tooltip, RadialBar, RadialBarChart, ResponsiveContainer, Cell, Legend, Sector } from '../../../../src';
 import { CategoricalChartProps } from '../props/ChartProps';
 
 export default {
@@ -18,7 +18,8 @@ export const Simple = {
     return (
       <ResponsiveContainer width="100%" height={400}>
         <RadialBarChart data={data}>
-          <RadialBar dataKey="uv" />
+          <RadialBar dataKey="uv" activeShape={<Sector fill="red" />} activeIndex={3} />
+          <Tooltip />
         </RadialBarChart>
       </ResponsiveContainer>
     );

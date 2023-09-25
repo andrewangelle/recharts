@@ -2194,8 +2194,9 @@ export const generateCategoricalChart = ({
            * An example usage case is a FunnelChart
            */
           const {
-            graphicalItem: { item: xyItem, childIndex },
-          } = this.getItemByXY(this.state.activeCoordinate);
+            graphicalItem: { item: xyItem = element },
+            childIndex,
+          } = this.getItemByXY(this.state.activeCoordinate) ?? { graphicalItem };
 
           const elementProps = { ...item.props, ...itemEvents, activeIndex: childIndex };
 

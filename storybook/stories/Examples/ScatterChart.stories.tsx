@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import React from 'react';
 import {
+  Dot,
   ScatterChart,
   LineChart,
   ResponsiveContainer,
@@ -47,7 +48,7 @@ export const Simple = {
           <XAxis type="number" dataKey="x" name="stature" unit="cm" />
           <YAxis type="number" dataKey="y" name="weight" unit="kg" />
           <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-          <Scatter name="A school" data={data} fill="#8884d8" />
+          <Scatter activeShape={<Dot fill="red" />} name="A school" data={data} fill="#8884d8" />
         </ScatterChart>
       </ResponsiveContainer>
     );

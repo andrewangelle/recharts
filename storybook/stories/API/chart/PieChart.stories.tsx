@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pie, PieChart, ResponsiveContainer } from '../../../../src';
+import { Pie, PieChart, ResponsiveContainer, Tooltip } from '../../../../src';
 import { pageData } from '../../data';
 import { CategoricalChartProps } from '../props/ChartProps';
 
@@ -16,7 +16,8 @@ export const Simple = {
     return (
       <ResponsiveContainer width="100%" height={400}>
         <PieChart {...args}>
-          <Pie data={data} dataKey="uv" />
+          <Pie data={data} dataKey="uv" activeIndex={0} activeShape={{ fill: 'red' }} />
+          <Tooltip />
         </PieChart>
       </ResponsiveContainer>
     );

@@ -18,7 +18,7 @@ export const Simple = {
     return (
       <ResponsiveContainer width="100%" height={400}>
         <RadialBarChart data={data}>
-          <RadialBar dataKey="uv" activeShape={<Sector fill="red" />} activeIndex={3} />
+          <RadialBar dataKey="uv" activeShape={<Sector fill="red" />} />
           <Tooltip />
         </RadialBarChart>
       </ResponsiveContainer>

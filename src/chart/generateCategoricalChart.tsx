@@ -2173,6 +2173,14 @@ export const generateCategoricalChart = ({
             return [graphicalItem, this.renderActiveBar({ item, childIndex: activeTooltipIndex })];
           }
 
+          if (activeShape) {
+            return [
+              cloneElement(element, { ...item.props, ...itemEvents, activeIndex: activeTooltipIndex }),
+              null,
+              null,
+            ];
+          }
+
           if (!_.isNil(activePoint)) {
             return [
               graphicalItem,
@@ -2194,8 +2202,7 @@ export const generateCategoricalChart = ({
            * An example usage case is a FunnelChart
            */
           const {
-            graphicalItem: { item: xyItem = element },
-            childIndex,
+            graphicalItem: { item: xyItem = element, childIndex },
           } = this.getItemByXY(this.state.activeCoordinate) ?? { graphicalItem };
 
           const elementProps = { ...item.props, ...itemEvents, activeIndex: childIndex };

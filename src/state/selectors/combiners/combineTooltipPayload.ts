@@ -7,7 +7,7 @@ import {
   TooltipPayloadSearcher,
 } from '../../tooltipSlice';
 import { ChartData, ChartDataState } from '../../chartDataSlice';
-import { DataKey, TooltipEventType } from '../../../util/types';
+import { Coordinate, DataKey, TooltipEventType } from '../../../util/types';
 import { findEntryInArray } from '../../../util/DataUtils';
 import { getTooltipEntry, getValueByDataKey } from '../../../util/ChartUtils';
 import { getSliced } from '../../../util/getSliced';
@@ -23,6 +23,12 @@ function selectFinalData(dataDefinedOnItem: unknown, dataDefinedOnChart: ChartDa
   return dataDefinedOnChart;
 }
 
+function isCoordinatesArray(
+  position: Record<string, Coordinate> | readonly Coordinate[],
+): position is readonly Coordinate[] {
+  return Array.isArray(position) && position.length > 0;
+}
+
 export const combineTooltipPayload = (
   tooltipPayloadConfigurations: ReadonlyArray<TooltipPayloadConfiguration>,
   activeIndex: TooltipIndex,
@@ -31,6 +37,7 @@ export const combineTooltipPayload = (
   activeLabel: string | undefined,
   tooltipPayloadSearcher: TooltipPayloadSearcher | undefined,
   tooltipEventType: TooltipEventType | undefined,
+  activeCoordinate?: Coordinate,
 ): TooltipPayload | undefined => {
   if (activeIndex == null || tooltipPayloadSearcher == null) {
     return undefined;
@@ -39,10 +46,28 @@ export const combineTooltipPayload = (
 
   const init: Array<TooltipPayloadEntry> = [];
 
-  return tooltipPayloadConfigurations.reduce((agg, { dataDefinedOnItem, settings }): Array<TooltipPayloadEntry> => {
+  return tooltipPayloadConfigurations.reduce((agg, config): Array<TooltipPayloadEntry> => {
+    const { dataDefinedOnItem, settings, positions } = config;
     const finalData = selectFinalData(dataDefinedOnItem, chartData);
 
     const sliced = Array.isArray(finalData) ? getSliced(finalData, dataStartIndex, dataEndIndex) : finalData;
+
+    /**
+     * Multiple data indicies will match activeIndex when there are multiple Scatters and each has its own data array.
+     * To prevent payloads getting combined from the indicies that are not the item being interacted with
+     * we will also check the active coordinate against the payload's position coordinate before aggregating
+     */
+    if (
+      isCoordinatesArray(positions) &&
+      tooltipEventType === 'item' &&
+      activeCoordinate &&
+      positions[Number(activeIndex)]
+    ) {
+      const itemCoordinate = positions[Number(activeIndex)];
+      if (itemCoordinate.x !== activeCoordinate.x || itemCoordinate.y !== activeCoordinate.y) {
+        return agg;
+      }
+    }
 
     const finalDataKey: DataKey<any> | undefined = settings?.dataKey ?? tooltipAxisDataKey;
     // BaseAxisProps does not support nameKey but it could!
@@ -54,9 +79,6 @@ export const combineTooltipPayload = (
       /*
        * findEntryInArray won't work for Scatter because Scatter provides an array of arrays
        * as tooltip payloads and findEntryInArray is not prepared to handle that.
-       * Sad but also ScatterChart only allows 'item' tooltipEventType
-       * and also this is only a problem if there are multiple Scatters and each has its own data array
-       * so let's fix that some other time.
        */
       !Array.isArray(sliced[0]) &&
       /*

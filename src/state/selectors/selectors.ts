@@ -177,6 +177,7 @@ export const selectTooltipPayload: (
     selectActiveLabel,
     selectTooltipPayloadSearcher,
     pickTooltipEventType,
+    selectActiveCoordinate,
   ],
   combineTooltipPayload,
 );

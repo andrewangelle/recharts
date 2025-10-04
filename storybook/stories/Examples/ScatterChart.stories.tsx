@@ -1,4 +1,5 @@
 import { Args, Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within, fireEvent } from 'storybook/test';
 import React, { useState } from 'react';
 import {
   CartesianGrid,
@@ -111,6 +112,21 @@ export const ThreeDim = {
       bottom: 20,
       left: 20,
     },
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const { findByRole } = within(canvasElement);
+
+    async function testTooltipContent(name: string, expectedPayload: string) {
+      const pathElements = canvasElement.getElementsByTagName('path');
+      const scatterPoints = Array.from(pathElements).filter(el => el.getAttribute('name') === name);
+      const [firstPoint] = scatterPoints;
+      fireEvent.mouseOver(firstPoint);
+      const tooltipContentText = (await findByRole('status')).innerText;
+      return expect(tooltipContentText).toMatch(expectedPayload);
+    }
+
+    await testTooltipContent('A school', 'score : 200km\nstature : 100cm\nweight : 200kg');
+    await testTooltipContent('B school', 'score : 240km\nstature : 200cm\nweight : 260kg');
   },
 };
 
